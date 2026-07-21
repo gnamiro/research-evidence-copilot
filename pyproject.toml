@@ -1,0 +1,16 @@
+[project]
+name = "research-evidence-copilot"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "dbt-core>=1.12.0",
+    "langchain>=1.3.14",
+    "numpy>=2.5.1",
+    "ollama>=0.6.2",
+    "pandas>=3.0.3",
+    "pgvector>=0.5.0",
+    "psycopg[binary]>=3.3.4",
+    "streamlit>=1.59.2",
+]
