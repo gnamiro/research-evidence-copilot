@@ -153,6 +153,47 @@ docker compose exec postgres sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -
 
 Database extension initialization and an automated health check are still required before Day 1 is complete.
 
+## arXiv ingestion
+
+Run a full load with an explicit cutoff so the search can be reproduced:
+
+```bash
+uv run ingest-arxiv full \
+  --start 2020-01-01 \
+  --cutoff 2026-07-22 \
+  --target 300 \
+  --user-agent "research-evidence-copilot/0.1 (contact: you@example.com)"
+```
+
+The command saves immutable Atom XML pages and a `manifest.json` under
+`data/raw/arxiv/<run-id>/`. It publishes the deduplicated canonical dataset to
+`data/processed/arxiv_papers.jsonl` only after the complete run succeeds.
+Duplicate query hits are identified by `(arxiv_id, version)`; different paper
+versions remain separate records.
+
+Run an incremental load over the next submitted-date window:
+
+```bash
+uv run ingest-arxiv incremental \
+  --start 2026-07-22 \
+  --cutoff 2026-07-23 \
+  --target 300 \
+  --user-agent "research-evidence-copilot/0.1 (contact: you@example.com)"
+```
+
+The incremental command merges new results into the existing canonical JSONL
+file without duplicating paper versions. Use a small overlapping date window at
+the boundary between runs.
+
+Run the offline ingestion tests without contacting arXiv:
+
+```bash
+uv run pytest tests/ingestion -q
+```
+
+Use `uv run ingest-arxiv --help` to see all options. Live API requests default
+to a three-second polite interval and run serially.
+
 ## Known MVP limitations
 
 - Coverage is deliberately restricted to a reproducible arXiv search rather than all AI research.
