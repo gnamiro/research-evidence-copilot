@@ -2,6 +2,7 @@
 ./pipeline/data
 data
 *.csv
+.pytest-temp/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -55,6 +56,7 @@ coverage.xml
 *.lcov
 .hypothesis/
 .pytest_cache/
+.pytest-temp/
 cover/
 
 # Translations

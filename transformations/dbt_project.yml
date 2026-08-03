@@ -1,0 +1,16 @@
+name: research_evidence_copilot
+version: "1.0.0"
+config-version: 2
+
+profile: research_evidence_copilot
+
+model-paths: ["models"]
+test-paths: ["tests"]
+
+clean-targets:
+  - target
+  - dbt_packages
+
+models:
+  research_evidence_copilot:
+    +materialized: view

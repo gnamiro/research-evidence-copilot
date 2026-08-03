@@ -191,7 +191,7 @@ Run the offline ingestion tests without contacting arXiv:
 uv run pytest tests/ingestion -q
 ```
 
-If you encountered permission denied error add `--basement="$PWD\.pytest-temp"` to the command. 
+If you encountered permission denied error add `--basetemp="$PWD\.pytest-temp"` to the command. 
 
 Use `uv run ingest-arxiv --help` to see all options. Live API requests default
 to a three-second polite interval and run serially.
