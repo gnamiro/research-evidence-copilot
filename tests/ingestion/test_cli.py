@@ -29,11 +29,18 @@ def test_full_ingestion_writes_manifest_and_deduplicated_output(tmp_path):
         fetcher=fake_fetcher,
     )
 
+    run_records_path = tmp_path / "raw" / manifest["run_id"] / "records.jsonl"
+    manifest_path = tmp_path / "raw" / manifest["run_id"] / "manifest.json"
+    assert run_records_path.exists(), f"Error: {run_records_path} does not exist"
+
     records = [json.loads(line) for line in output.read_text().splitlines()]
+    run_records = [json.loads(line) for line in run_records_path.read_text().splitlines()]
+
     saved_manifest = json.loads(
-        (tmp_path / "raw" / manifest["run_id"] / "manifest.json").read_text()
+        manifest_path.read_text()
     )
 
+    assert len(run_records) == manifest["records_fetched"]
     assert manifest["status"] == "success"
     assert saved_manifest["status"] == "success"
     assert len(records) == 2

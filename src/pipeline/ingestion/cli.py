@@ -135,6 +135,8 @@ def run_ingestion(
     run_id = make_run_id()
     run_directory = raw_directory / run_id
     manifest_path = run_directory / "manifest.json"
+    run_records_path = run_directory / "records.jsonl"
+
     manifest: dict[str, Any] = {
         "run_id": run_id,
         "source": "arxiv",
@@ -166,6 +168,8 @@ def run_ingestion(
             fetcher=fetcher,
         )
         selected = fetched[:target]
+
+        write_jsonl(run_records_path, fetched)
 
         if mode == "incremental":
             selected = deduplicate_papers([*read_jsonl(output_path), *selected])
