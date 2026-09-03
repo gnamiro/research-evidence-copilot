@@ -191,6 +191,12 @@ Run the offline ingestion tests without contacting arXiv:
 uv run pytest tests/ingestion -q
 ```
 
+If the above code didn't run (especially on windows) try this:
+
+```bash
+uv run python -m pytest tests/ingestion -q
+```
+
 If you encountered permission denied error add `--basetemp="$PWD\.pytest-temp"` to the command. 
 
 Use `uv run ingest-arxiv --help` to see all options. Live API requests default

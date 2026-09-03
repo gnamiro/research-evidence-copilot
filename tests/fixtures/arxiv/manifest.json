@@ -1,0 +1,27 @@
+{
+  "run_id": "arxiv",
+  "source": "arxiv",
+  "mode": "full",
+  "status": "success",
+  "started_at": "2026-09-02T21:23:39.929022+00:00",
+  "completed_at": "2026-09-02T21:24:22.795892+00:00",
+  "start_date": "2020-01-01",
+  "cutoff_date": "2026-08-31",
+  "target": 10,
+  "page_size": 100,
+  "queries": {
+    "rag": "(cat:cs.IR OR cat:cs.CL) AND ((((ti:\"retrieval augmented generation\" OR abs:\"retrieval augmented generation\") OR ti:\"retrieval-augmented generation\") OR abs:\"retrieval-augmented generation\") OR abs:\"retrieval augmented language model\") AND submittedDate:[202001010000 TO 202608310000]",
+    "evaluation": "(cat:cs.IR OR cat:cs.CL) AND ((((ti:\"retrieval augmented generation\" OR abs:\"retrieval augmented generation\") OR ti:\"retrieval-augmented generation\") OR abs:\"retrieval-augmented generation\") OR abs:\"retrieval augmented language model\") AND (ti:evaluation OR abs:evaluation OR ti:benchmark OR abs:benchmark) AND submittedDate:[202001010000 TO 202608310000]",
+    "hallucination": "(cat:cs.IR OR cat:cs.CL) AND ((((ti:\"retrieval augmented generation\" OR abs:\"retrieval augmented generation\") OR ti:\"retrieval-augmented generation\") OR abs:\"retrieval-augmented generation\") OR abs:\"retrieval augmented language model\") AND (ti:hallucination OR abs:hallucination OR ti:faithfulness OR abs:faithfulness) AND submittedDate:[202001010000 TO 202608310000]",
+    "retrieval": "(cat:cs.IR OR cat:cs.CL) AND ((((ti:\"retrieval augmented generation\" OR abs:\"retrieval augmented generation\") OR ti:\"retrieval-augmented generation\") OR abs:\"retrieval-augmented generation\") OR abs:\"retrieval augmented language model\") AND (ti:retrieval OR abs:retrieval OR ti:reranking OR abs:reranking) AND submittedDate:[202001010000 TO 202608310000]"
+  },
+  "pages_downloaded": {
+    "rag": 3,
+    "evaluation": 3,
+    "hallucination": 2,
+    "retrieval": 2
+  },
+  "records_fetched": 10,
+  "output_records": 10,
+  "error": null
+}
