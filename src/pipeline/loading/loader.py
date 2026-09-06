@@ -77,7 +77,7 @@ def load_manifest(raw_path_file: str, run_id: str) -> dict:
         )
 
     if not isinstance(manifest_data.get("records_fetched"), int) \
-            or manifest_data["records_fetched"] <= 0:
+            or manifest_data["records_fetched"] < 0:
         raise ValueError(
             f"Invalid records_fetched for run_id {run_id}."
         )
@@ -98,26 +98,29 @@ def load_records(raw_path_file: str, run_id: str) -> list:
     records_path = Path(raw_path_file) / run_id / "records.jsonl"
     records_data = read_json_file_line_by_line(records_path)
 
-    assert isinstance(records_data, list), f"Records data for run_id {run_id} is not a list."
-    assert len(records_data) > 0, f"Records data for run_id {run_id} is empty."
+    if not isinstance(records_data, list):
+        raise ValueError(
+            f"Records data for run_id {run_id} is not a list."
+        )
+    
     for record in records_data:
         validate_record(record)
 
     return records_data
 
-def load_raw_data(raw_path_file: str, run_id: str) -> tuple:
+def load_raw_data(raw_directory: str, run_id: str) -> tuple:
     """
     Reads both the manifest.json and records.jsonl files for a given run_id.
 
     Args:
-        raw_path_file (str): The base path to the raw data directory.
+        raw_directory (str): The base path to the raw data directory.
         run_id (str): The unique identifier for the run.
 
     Returns:
         tuple: A tuple containing the manifest data (dict) and records data (list).
     """
-    manifest_data = load_manifest(raw_path_file, run_id)
-    records_data = load_records(raw_path_file, run_id)
+    manifest_data = load_manifest(raw_directory, run_id)
+    records_data = load_records(raw_directory, run_id)
 
     if manifest_data["records_fetched"] != len(records_data):
         raise ValueError(

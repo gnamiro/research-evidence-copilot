@@ -122,6 +122,17 @@ def test_load_raw_data_rejects_a_record_count_mismatch(tmp_path):
     with pytest.raises(ValueError, match="Mismatch between records_fetched"):
         load_raw_data(tmp_path, RUN_ID)
 
+def test_load_raw_data_accepts_successful_run_with_zero_records(tmp_path):
+    run_directory = create_run_directory(tmp_path)
+    write_manifest(run_directory, valid_manifest(records_fetched=0))
+    write_records(run_directory, [])
+
+    loaded_manifest, loaded_records = load_raw_data(tmp_path, RUN_ID)
+
+    assert loaded_manifest['status'] == 'success'
+    assert loaded_manifest['records_fetched'] == 0
+    assert loaded_records == []
+
 
 @pytest.mark.parametrize("missing_field", ["arxiv_id", "version"])
 def test_validate_record_rejects_a_missing_identifier_field(missing_field):
