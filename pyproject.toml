@@ -40,3 +40,6 @@ dev = [
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 addopts = ["--basetemp=.pytest-temp"]
+markers = [
+    "DBintegration: tests that interact with PostgreSQL" 
+]
