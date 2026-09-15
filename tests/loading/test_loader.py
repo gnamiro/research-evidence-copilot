@@ -67,7 +67,20 @@ def test_load_raw_data_accepts_a_valid_successful_run(tmp_path):
     loaded_manifest, loaded_records = load_raw_data(tmp_path, RUN_ID)
 
     assert loaded_manifest == manifest
-    assert loaded_records == records
+    assert len(loaded_records) == len(records)
+
+    for line_number, (loaded_record, original_record) in enumerate(
+        zip(loaded_records, records),
+        start=1,
+    ):
+        assert loaded_record["run_id"] == RUN_ID
+        assert loaded_record["arxiv_id"] == original_record["arxiv_id"]
+        assert loaded_record["version"] == original_record["version"]
+        assert loaded_record["record"] == original_record
+        assert loaded_record["matched_queries"] == original_record["matched_queries"]
+        assert loaded_record["raw_pages"] == original_record["raw_pages"]
+        assert loaded_record["source_line_number"] == line_number
+        assert loaded_record["source_file_path"].endswith("records.jsonl")
 
 
 def test_load_raw_data_rejects_a_missing_manifest(tmp_path):

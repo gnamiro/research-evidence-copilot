@@ -40,7 +40,7 @@ def insert_manifest_2_db(connection, manifest_path, validated_manifest):
             "records_fetched": validated_manifest["records_fetched"],
             "output_records": validated_manifest["output_records"],
             "error": validated_manifest["error"],
-            "manifest_path": manifest_path,
+            "manifest_path": str(manifest_path),
         }
     )
     inserted = result.fetchone()
@@ -64,52 +64,50 @@ def insert_manifest_2_db(connection, manifest_path, validated_manifest):
 def insert_records_2_db(connection, records):
     query = text("""
         INSERT INTO raw.arxiv_paper_observations (
-            run_id, arxiv_id, version, record, matched_queries, raw_pages, source_file, source_line_number
+            run_id, arxiv_id, version, record, matched_queries, raw_pages, source_file_path, source_line_number
         )
         VALUES (
-            :run_id, :arxiv_id, :version, :record, :matched_queries, :raw_pages, :source_file, :source_line_number
+            :run_id, :arxiv_id, :version, :record, :matched_queries, :raw_pages, :source_file_path, :source_line_number
         )
         ON CONFLICT (run_id, arxiv_id, version)
-        DO UPDATE SET
+        DO NOTHING
         RETURNING run_id, arxiv_id, version
     """).bindparams(
         bindparam("record", type_=JSONB),
         bindparam("matched_queries", type_=JSONB),
         bindparam("raw_pages", type_=JSONB),
     )
+    try:
+        inserted_count, skipped_count = 0, 0
 
-    result = connection.execute(
-        query,
-        [
-            {
-                "run_id": record["run_id"],
-                "arxiv_id": record["arxiv_id"],
-                "version": record["version"],
-                "record": record["record"],
-                "matched_queries": record["matched_queries"],
-                "raw_pages": record["raw_pages"],
-                "source_file": record["source_file"],
-                "source_line_number": record["source_line_number"],
-            }
-            for record in records
-        ]
-    )
+        for record in records:
+            result = connection.execute(
+                query,
+                {
+                    "run_id": record["run_id"],
+                    "arxiv_id": record["arxiv_id"],
+                    "version": record["version"],
+                    "record": record["record"],
+                    "matched_queries": record["matched_queries"],
+                    "raw_pages": record["raw_pages"],
+                    "source_file_path": record["source_file_path"],
+                    "source_line_number": record["source_line_number"],
+                }
+            )
+            row = result.fetchone()
 
-    inserted_records = result.fetchall()
-
-    if inserted_records:
+            if row is None:
+                skipped_count += 1
+            else:
+                inserted_count += 1      
         return {
             "success": True,
-            "inserted_count": len(inserted_records),
-            "message": f"Successfully inserted {len(inserted_records)} records into the database."
+            "inserted_count": inserted_count,
+            "skipped_count":skipped_count,
+            "message": f"Successfully inserted {inserted_count} records into the database."
         }
-    else:
-        return {
-            "success": False,
-            "inserted_count": 0,
-            "message": "No records were inserted into the database."
-        }
-
+    except Exception as e:
+        raise ValueError("There is an error during inserting records")
 
 def insert_raw_data_2_db(data_path, url_id, validated_manifest, validated_records):
     with engine.begin() as connection:
@@ -134,11 +132,15 @@ def insert_raw_data_2_db(data_path, url_id, validated_manifest, validated_record
         "manifest_result": manifest_result,
         "records_result": records_result
     }
+
 if __name__ == "__main__":
     import pipeline.loading.loader as loader
-    manifest_path = Path("./data/raw/arxiv/")
+    raw_path = Path("./data/raw/arxiv/")
     url_id = "20260902T212339Z-04d79924"
-    validated_manifest = loader.load_manifest(manifest_path, url_id)
-    with engine.begin() as connection:
-        result = insert_manifest_2_db(connection, str(manifest_path / url_id / "manifest.json"), validated_manifest)
+
+    validated_manifest, validated_records = loader.load_raw_data(raw_path, url_id)
+
+    
+    result = insert_raw_data_2_db(str(raw_path), url_id, validated_manifest, validated_records)
+
     print(result)

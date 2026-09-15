@@ -5,6 +5,22 @@ from utils.logging_config import logging
 logger = logging.getLogger(__name__)
 
 
+def add_records_info(records_data: list, url_id: str, records_path: str) -> dict:
+    new_record_data = []
+    for i, record in enumerate(records_data):
+        new_record = {}
+        new_record["run_id"] = url_id
+        new_record['arxiv_id'] = record["arxiv_id"] 
+        new_record["version"] = record["version"]
+        new_record['record'] = record
+        new_record["matched_queries"] = record["matched_queries"]
+        new_record["raw_pages"] = record["raw_pages"]
+        new_record["source_file_path"] = str(records_path)
+        new_record["source_line_number"] = i + 1
+        new_record_data.append(new_record)
+
+    return new_record_data
+
 def validate_record(record):
     required_keys = {
         "arxiv_id",
@@ -106,7 +122,14 @@ def load_records(raw_path_file: str, run_id: str) -> list:
     for record in records_data:
         validate_record(record)
 
-    return records_data
+    validated_records = add_records_info(records_data, run_id, records_path)
+
+    if len(validated_records) != len(records_data):
+        raise ValueError(
+            f"loader.py (line: 128): information added to teh records doesn't match"
+        )
+    
+    return validated_records
 
 def load_raw_data(raw_directory: str, run_id: str) -> tuple:
     """
