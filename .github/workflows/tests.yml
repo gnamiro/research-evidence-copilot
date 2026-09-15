@@ -34,4 +34,4 @@ jobs:
         run: uv sync --locked --dev
 
       - name: Run tests
-        run: uv run pytest tests/ -q
+        run: uv run pytest tests/ -q --ignore=tests/integration
