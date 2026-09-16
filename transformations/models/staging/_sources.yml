@@ -1,0 +1,107 @@
+version: 2
+
+sources:
+  - name: raw
+    schema: raw
+    description: "Raw data loaded by the Python ingestion loader.\nIt contain information about ingestion and arXiv observed data"
+
+    tables:
+      - name: ingestion_runs
+        description: "one row represents one execution of the arXiv ingestion command."
+        columns:
+          - name: run_id
+            description: "Unique run identifier from "
+            data_tests:
+              - not_null
+              - unique
+          - name: source
+            description: "Source system from the manifest; currently `arxiv`."
+            data_tests:
+              - not_null
+              - accepted_values:
+                  arguments:
+                    values:
+                      - arxiv
+          - name: mode
+            description: "Ingestion mode: `full` or `incremental`."
+            data_tests:
+              - not_null
+              - accepted_values:
+                  arguments:
+                    values:
+                      - full
+                      - incremental
+          - name: status
+            description: "Run state: `running`, `success`, or `failed`."
+            data_tests:
+              - not_null
+              - accepted_values:
+                  arguments:
+                    values:
+                      - running
+                      - success
+                      - failed
+          - name: started_at
+            description: "UTC start timestamp from the manifest."
+          - name: completed_at
+            description: "UTC completion timestamp; null while a run is still running."
+          - name: start_date
+            description: "Inclusive start of the arXiv search window."
+          - name: cutoff_date
+            description: "Inclusive end of the arXiv search window."
+          - name: target
+            description: "Requested maximum number of canonical output records."
+          - name: page_size
+            description: "Number of records requested from the API per page."
+          - name: queries
+            description: "Named arXiv search expressions from the manifest."
+          - name: pages_downloaded
+            description: "Number of API pages downloaded for each named query."
+          - name: records_fetched
+            description: "Unique records fetched before applying the output target."
+          - name: output_records
+            description: " Total records in the cumulative canonical output after the run completes"
+          - name: error
+            description: "Failure details; normally null for a successful run."
+          - name: manifest_path
+            description: "Path of the manifest used by the database loader. Supplied by the loader rather than read from a manifest field."
+          - name: loaded_at
+            description: "Time the row was loaded into PostgreSQL; defaults to the database's current timestamp."
+
+      - name: arxiv_paper_observations
+        description: "one row represents one arXiv paper version observed during one ingestion run."
+        columns:
+          - name: run_id
+            description: "Run that observed the record; obtained from the matching manifest."
+            data_tests:
+              - not_null
+              - relationships:
+                  arguments:
+                    to: source("raw", "ingestion_runs")
+                    field: run_id
+          - name: arxiv_id
+            description: "Stable arXiv paper identifier extracted from the parsed JSONL record."
+            data_tests:
+              - not_null
+          - name: version
+            description: "arXiv version number extracted from the parsed JSONL record."
+            data_tests:
+              - not_null
+          - name: record
+            description: "Complete parsed JSONL object. This is the raw source of truth for later dbt models."
+            data_tests:
+              - not_null
+          - name: matched_queries
+            description: "Named searches that returned the record; copied from `record.matched_queries`."
+          - name: raw_pages
+            description: "Project-relative raw XML page paths that support the record; copied from `record."
+          - name: source_file_path
+            description: "Path of the run-scoped JSONL file loaded into this table."
+            data_tests:
+              - not_null
+          - name: source_line_number
+            description: "One-based line number in that JSONL file for exact record-level lineage."
+            data_tests:
+              - not_null
+          - name: loaded_at
+            description: "Time the row was loaded into PostgreSQL; defaults to the database's current timestamp"

@@ -5,7 +5,7 @@ from utils.logging_config import logging
 logger = logging.getLogger(__name__)
 
 
-def add_records_info(records_data: list, url_id: str, records_path: str) -> dict:
+def add_records_info(records_data: list, url_id: str, records_path: str) -> list:
     new_record_data = []
     for i, record in enumerate(records_data):
         new_record = {}
