@@ -1,0 +1,139 @@
+version: 2
+
+models:
+  - name: stg_ingestion_runs
+    description: |
+      Standardized ingestion-run metadata from the raw ingestion table.
+
+      Grain: one row per ingestion execution.
+    
+    columns:
+      - name: run_id
+        description: Unique identifier for an ingestion run.
+        data_tests:
+          - not_null
+          - unique
+
+      - name: source
+        description: Source system used by the ingestion run.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - arxiv
+      
+      - name: mode
+        description: Whether the ingestion was a full or incremental run.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - full
+                  - incremental
+      - name: status
+        description: Final or current status of the ingestion run.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - running
+                  - success
+                  - failed
+      
+      - name: started_at
+        description: Timestamp when ingestion started.
+      
+      - name: completed_at
+        description: Timestamp when ingestion completed; null while running.
+      
+      - name: records_fetched
+        description: Number of unique records fetched during the run.
+      
+      - name: output_records
+        description: Number of records in the canonical output after the run.
+      
+      - name: manifest_path
+        description: Path to the run-specific manifest file.
+      
+      - name: loaded_at
+        description: Timestamp when the raw run was loaded into PostgreSQL.
+
+  - name: stg_arxiv_paper_observations
+    description: |
+      Standardized arXiv paper metadata observed during ingestion.
+
+      Grain: one arXiv paper version observed during one ingestion run.
+    
+    columns:
+      - name: run_id
+        description: Ingestion run that observed this paper version.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_ingestion_runs')
+                field: run_id
+      
+      - name: arxiv_id
+        description: Stable arXiv paper identifier.
+        data_tests:
+          - not_null
+      
+      - name: version
+        description: Version number of the arXiv paper.
+        data_tests:
+          - not_null
+
+      - name: title
+        description: Paper title with normalized whitespace.
+
+      - name: abstract
+        description: Paper abstract with normalized whitespace.
+
+      - name: authors
+        description: Authors preserved as a JSON array.
+
+      - name: categories
+        description: arXiv categories preserved as a JSON array.
+
+      - name: primary_category
+        description: Primary arXiv category assigned to the paper.
+        data_tests:
+          - not_null
+
+      - name: published_at
+        description: Timestamp when this paper version was initially published.
+
+      - name: updated_at
+        description: Timestamp when this paper version was last updated.
+
+      - name: license
+        description: Paper licence reported by arXiv, when available.
+
+      - name: pdf_url
+        description: URL of the paper PDF.
+
+      - name: source_url
+        description: URL of the paper abstract page on arXiv.
+
+      - name: matched_queries
+        description: Ingestion queries that returned this paper.
+
+      - name: raw_pages
+        description: Raw API response pages containing this observation.
+
+      - name: source_file_path
+        description: Path to the run-specific records JSONL file.
+        data_tests:
+          - not_null
+
+      - name: source_line_number
+        description: One-based line number in the run-specific JSONL file.
+        data_tests:
+          - not_null
+
+      - name: loaded_at
+        description: Timestamp when the observation was loaded into PostgreSQL.

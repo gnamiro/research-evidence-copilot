@@ -13,4 +13,5 @@ clean-targets:
 
 models:
   research_evidence_copilot:
-    +materialized: view
+    staging:
+      +materialized: view
