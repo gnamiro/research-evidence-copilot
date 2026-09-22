@@ -1,0 +1,83 @@
+version: 2
+
+models:
+  - name: paper_versions
+    description: |
+      One row per distinct arXiv paper version, selected from the most recently loaded observation of that version.
+
+      Grain: Grain: one row per unique combination of arxiv_id and version.
+    
+    columns:
+      - name: run_id
+        description: Ingestion run that observed this paper version.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_ingestion_runs')
+                field: run_id
+
+      - name: arxiv_id
+        description: Stable arXiv paper id
+        data_tests:
+          - not_null
+      
+      - name: version
+        description: Version number of the arXiv paper.
+        data_tests:
+          - not_null
+      
+      - name: title
+        description: Paper title 
+        data_tests:
+          - not_null
+      
+      - name: abstract
+        description: Paper abstract
+      
+      - name: authors
+        description: Authors preserved as a JSON array.
+      
+      - name: categories
+        description: arXiv categories preserved as a JSON array.
+
+      - name: primary_category
+        description: Primary arXiv category assigned to the paper.
+        data_tests:
+          - not_null
+
+      - name: published_at
+        description: Timestamp when this paper version was initially published.
+
+      - name: updated_at
+        description: Timestamp when this paper version was last updated.
+
+      - name: license
+        description: Paper licence reported by arXiv, when available.
+
+      - name: pdf_url
+        description: URL of the paper PDF.
+
+      - name: source_url
+        description: URL of the paper abstract page on arXiv.
+
+      - name: matched_queries
+        description: Ingestion queries that returned this paper.
+
+      - name: raw_pages
+        description: Raw API response pages containing this observation.
+
+      - name: source_file_path
+        description: Path to the run-specific records JSONL file.
+        data_tests:
+          - not_null
+
+      - name: source_line_number
+        description: One-based line number in the run-specific JSONL file.
+        data_tests:
+          - not_null
+
+      - name: loaded_at
+        description: Timestamp when the observation was loaded into PostgreSQL.
+        data_tests:
+          - not_null

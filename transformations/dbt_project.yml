@@ -15,3 +15,5 @@ models:
   research_evidence_copilot:
     staging:
       +materialized: view
+    core:
+      +materialized: table
