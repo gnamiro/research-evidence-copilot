@@ -168,6 +168,10 @@ models:
       One row per paper author, with normalized author names and hashed author IDs.
 
       Grain: One row per unique combination of arxiv_id, and normalized_author_name.
+
+      P.S: for the sake of simplicity, we are using md5 hash of normalized_author_name as author_id. In a production system, we would use a more robust method to generate stable author IDs.
+      Also for the sake of simplicity, we are including this intermediate model in the core layer. In a production system, we would likely place this in an intermediate layer (silver model).
+
     columns:
       - name: arxiv_id
         description: Stable arXiv paper id
@@ -239,3 +243,79 @@ models:
         description: Position of the author in the author list for the paper.
         data_tests:
           - not_null
+  - name: int_paper_categories_expanded
+    description: |
+      One row per paper arxiv_id and category_code.
+
+      Grain: One row per unique combination of arxiv_id and normalized_category_code.
+
+      P.S: for the sake of simplicity, we are including this intermediate model in the core layer. In a production system, we would likely place this in an intermediate layer (silver model).
+
+    columns:
+      - name: arxiv_id
+        description: Stable arXiv paper id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('papers')
+                field: arxiv_id
+      - name: category_code
+        description: Category code as reported by arXiv.
+        data_tests:
+          - not_null
+      - name: category_position
+        description: Position of the category in the category list for the paper.
+        data_tests:
+          - not_null
+      - name: is_primary
+        description: Boolean flag indicating whether this category is the primary category for the paper.
+        data_tests:
+          - not_null
+  - name: categories
+    description: |
+      One row per unique category, with a normalized category code.
+
+      Grain: One row per unique normalized_category_code.
+    columns:
+      - name: category_code
+        description: Category code as reported by arXiv.
+        data_tests:
+          - not_null
+          - unique
+  
+  - name: paper_categories
+    description: |
+      One row per paper-category relationship, linking papers to their categories.
+
+      Grain: One row per unique combination of arxiv_id and category_code.
+    columns:
+      - name: arxiv_id
+        description: Stable arXiv paper id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('papers')
+                field: arxiv_id
+      - name: category_code
+        description: Category code as reported by arXiv.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('categories')
+                field: category_code
+      - name: category_position
+        description: Position of the category in the category list for the paper.
+        data_tests:
+          - not_null
+
+      - name: is_primary
+        description: Boolean flag indicating whether this category is the primary category for the paper.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [true, false]
+                quote: false
