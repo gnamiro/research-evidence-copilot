@@ -319,3 +319,79 @@ models:
               arguments:
                 values: [true, false]
                 quote: false
+  
+  - name: ingestion_runs
+    description: |
+      Analytics-ready history of ingestion executions.
+
+      Grain: One row per unique run_id.
+    columns:
+      - name: run_id
+        description: Unique identifier for the ingestion run.
+        data_tests:
+          - not_null
+          - unique
+      - name: source
+        description: Source of the ingestion run (e.g., arXiv API).
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['arxiv']
+      - name: mode
+        description: Mode of the ingestion run (e.g., full, incremental).
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['full', 'incremental']
+      - name: status
+        description: Status of the ingestion run (running, success, or failed).
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['success', 'failed', 'running']
+      - name: started_at
+        description: Timestamp when the ingestion run started.
+        data_tests:
+          - not_null
+      - name: completed_at
+        description: Timestamp when the ingestion run completed.
+      - name: start_date
+        description: Date when the ingestion run started.
+        data_tests:
+          - not_null
+      - name: cutoff_date
+        description: Cutoff date for the ingestion run, used to filter papers.
+        data_tests:
+          - not_null
+      - name: target
+        description: Target of the ingestion run (e.g., papers, authors).
+      - name: page_size
+        description: Number of records requested per page in the ingestion run.
+      - name: queries
+        description: Ingestion queries executed during the run, preserved as a JSON array.
+      - name: pages_downloaded
+        description: Number of pages downloaded during the ingestion run.
+      - name: records_fetched
+        description: Number of records fetched during the ingestion run.
+        data_tests:
+          - not_null
+      - name: output_records
+        description: Number of records written to the output file during the ingestion run.
+        data_tests:
+          - not_null
+      - name: error
+        description: Error message if the ingestion run failed.
+      - name: manifest_path
+        description: Path to the ingestion run manifest file.
+        data_tests:
+          - not_null
+      - name: loaded_at
+        description: Timestamp when the ingestion run record was loaded into PostgreSQL.
+        data_tests:
+          - not_null
+      - name: duration_seconds
+        description: >
+          Total ingestion duration in seconds. Null while the run has no completion timestamp.
