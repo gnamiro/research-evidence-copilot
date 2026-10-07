@@ -48,12 +48,33 @@ models:
       
       - name: completed_at
         description: Timestamp when ingestion completed; null while running.
+
+      - name: start_date
+        description: Inclusive start of the arXiv search window.
+
+      - name: cutoff_date
+        description: Inclusive end of the arXiv search window.
+
+      - name: target
+        description: Requested maximum number of canonical output records.
+
+      - name: page_size
+        description: Number of records requested from the arXiv API per page.
+
+      - name: queries
+        description: JSON object mapping query names to arXiv search expressions.
+
+      - name: pages_downloaded
+        description: JSON object mapping query names to downloaded page counts.
       
       - name: records_fetched
         description: Number of unique records fetched during the run.
       
       - name: output_records
-        description: Number of records in the canonical output after the run.
+        description: Total records in the cumulative canonical output after the run completes.
+
+      - name: error
+        description: Failure details; normally null for a successful run.
       
       - name: manifest_path
         description: Path to the run-specific manifest file.

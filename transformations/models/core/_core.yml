@@ -247,7 +247,7 @@ models:
     description: |
       One row per paper arxiv_id and category_code.
 
-      Grain: One row per unique combination of arxiv_id and normalized_category_code.
+      Grain: One row per unique combination of arxiv_id and category_code.
 
       P.S: for the sake of simplicity, we are including this intermediate model in the core layer. In a production system, we would likely place this in an intermediate layer (silver model).
 
@@ -274,9 +274,9 @@ models:
           - not_null
   - name: categories
     description: |
-      One row per unique category, with a normalized category code.
+      One row per unique category, with a cleaned category code.
 
-      Grain: One row per unique normalized_category_code.
+      Grain: One row per unique category_code.
     columns:
       - name: category_code
         description: Category code as reported by arXiv.
@@ -359,27 +359,27 @@ models:
       - name: completed_at
         description: Timestamp when the ingestion run completed.
       - name: start_date
-        description: Date when the ingestion run started.
+        description: Inclusive start of the arXiv search window.
         data_tests:
           - not_null
       - name: cutoff_date
-        description: Cutoff date for the ingestion run, used to filter papers.
+        description: Inclusive end of the arXiv search window.
         data_tests:
           - not_null
       - name: target
-        description: Target of the ingestion run (e.g., papers, authors).
+        description: Requested maximum number of canonical output records.
       - name: page_size
         description: Number of records requested per page in the ingestion run.
       - name: queries
-        description: Ingestion queries executed during the run, preserved as a JSON array.
+        description: JSON object mapping query names to arXiv search expressions.
       - name: pages_downloaded
-        description: Number of pages downloaded during the ingestion run.
+        description: JSON object mapping query names to downloaded page counts.
       - name: records_fetched
         description: Number of records fetched during the ingestion run.
         data_tests:
           - not_null
       - name: output_records
-        description: Number of records written to the output file during the ingestion run.
+        description: Total records in the cumulative canonical output after the run completes.
         data_tests:
           - not_null
       - name: error

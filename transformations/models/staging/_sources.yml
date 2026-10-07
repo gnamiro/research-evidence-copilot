@@ -3,14 +3,14 @@ version: 2
 sources:
   - name: raw
     schema: raw
-    description: "Raw data loaded by the Python ingestion loader.\nIt contain information about ingestion and arXiv observed data"
+    description: "Raw data loaded by the Python ingestion loader.\nIt contains ingestion metadata and observed arXiv paper data."
 
     tables:
       - name: ingestion_runs
         description: "one row represents one execution of the arXiv ingestion command."
         columns:
           - name: run_id
-            description: "Unique run identifier from "
+            description: "Unique run identifier from the run manifest."
             data_tests:
               - not_null
               - unique
@@ -94,7 +94,7 @@ sources:
           - name: matched_queries
             description: "Named searches that returned the record; copied from `record.matched_queries`."
           - name: raw_pages
-            description: "Project-relative raw XML page paths that support the record; copied from `record."
+            description: "Project-relative raw XML page paths that support the record; copied from `record.raw_pages`."
           - name: source_file_path
             description: "Path of the run-scoped JSONL file loaded into this table."
             data_tests:
