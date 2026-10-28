@@ -26,6 +26,7 @@ dependencies = [
 [project.scripts]
 ingest-arxiv = "pipeline.ingestion.cli:main"
 load-abstract-chunks = "pipeline.chunking.cli:main"
+load-chunk-embeddings = "pipeline.embedding.cli:main"
 
 [build-system]
 requires = ["setuptools>=80"]
