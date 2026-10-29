@@ -82,3 +82,33 @@ def embed_chunks(chunks, model=None):
 
 def embed_chunk(chunk, model=None):
     return embed_chunks([chunk], model=model)[0]
+
+
+def query_encoder(query, model=None):
+    if not isinstance(query, str):
+        raise TypeError("Query must be a string.")
+
+    normalized_query = query.strip()
+    if not normalized_query:
+        raise ValueError("Query must not be empty.")
+
+    embedding_model = model if model is not None else get_embedding_model()
+
+    vector = embedding_model.encode_query(
+        [normalized_query],
+        normalize_embeddings=True,
+        convert_to_numpy=True,
+    )[0]
+
+    embedding = [float(value) for value in vector]
+
+    if len(embedding) != EMBEDDING_DIMENSION:
+        raise ValueError(
+            f"Expected {EMBEDDING_DIMENSION} dimensions, "
+            f"but received {len(embedding)}."
+        )
+
+    if not all(math.isfinite(value) for value in embedding):
+        raise ValueError("Embedding contains a non-finite value.")
+
+    return embedding

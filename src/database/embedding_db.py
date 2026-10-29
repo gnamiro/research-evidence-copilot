@@ -1,4 +1,5 @@
 from sqlalchemy import text
+from database.vector_utils import to_vector_literal
 
 
 INSERT_CHUNK_EMBEDDING = text(
@@ -30,16 +31,16 @@ INSERT_CHUNK_EMBEDDING = text(
 )
 
 
-def _to_vector_literal(embedding):
-    """Convert a list of numbers into pgvector's text representation."""
+# def _to_vector_literal(embedding):
+#     """Convert a list of numbers into pgvector's text representation."""
 
-    if not isinstance(embedding, (list, tuple)):
-        raise TypeError("embedding must be a list or tuple.")
+#     if not isinstance(embedding, (list, tuple)):
+#         raise TypeError("embedding must be a list or tuple.")
 
-    return "[" + ",".join(
-        format(float(value), ".17g")
-        for value in embedding
-    ) + "]"
+#     return "[" + ",".join(
+#         format(float(value), ".17g")
+#         for value in embedding
+#     ) + "]"
 
 
 def insert_chunk_embeddings(connection, embedding_records):
@@ -57,7 +58,7 @@ def insert_chunk_embeddings(connection, embedding_records):
             "model_name": record["model_name"],
             "model_revision": record["model_revision"],
             "embedding_dimension": record["embedding_dimension"],
-            "embedding": _to_vector_literal(record["embedding"]),
+            "embedding": to_vector_literal(record["embedding"]),
             "created_at": record["created_at"],
         }
 
